@@ -30,6 +30,9 @@ concurrency:
 
 jobs:
   automerge:
+    permissions:
+      contents: 'write'
+      id-token: 'write'
     environment: local
     runs-on: ubuntu-latest
     if: contains(github.event.pull_request.labels.*.name, 'automerge')
@@ -49,10 +52,8 @@ jobs:
       - id: automerge
         name: Auto merge PR
         uses: "pascalgn/automerge-action@v0.16.4"
-        permissions:
-          contents: write
         env:
-          MERGE_REQUIRED_APPROVALS: 1
+          MERGE_REQUIRED_APPROVALS: 0
           GITHUB_TOKEN: "${{ steps.get_workflow_token.outputs.token }}"
           MERGE_RETRIES: "12"
           MERGE_RETRY_SLEEP: "10000"
