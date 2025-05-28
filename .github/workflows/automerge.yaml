@@ -16,13 +16,13 @@ on:
   pull_request_review:
     types:
       - submitted
-  # check_suite:
-  #   types:
-  #     - completed
-  # check_run:
-  #   types:
-  #     - completed
-  # status: {}
+  check_suite:
+    types:
+      - completed
+  check_run:
+    types:
+      - completed
+  status: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
@@ -37,6 +37,9 @@ jobs:
     runs-on: ubuntu-latest
     if: contains(github.event.pull_request.labels.*.name, 'automerge')
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Info
         run: |
           echo "Running automerge workflow"
@@ -51,11 +54,7 @@ jobs:
 
       - id: automerge
         name: Auto merge PR
-        uses: "pascalgn/automerge-action@v0.16.4"
         env:
-          MERGE_REQUIRED_APPROVALS: 0
-          GITHUB_TOKEN: "${{ steps.get_workflow_token.outputs.token }}"
-          MERGE_RETRIES: "12"
-          MERGE_RETRY_SLEEP: "10000"
-          MERGE_METHOD: "squash"
-          # LOG: "TRACE"
+          GH_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
+        run: |
+          gh pr merge ${{ github.event.pull_request.number }} --auto --squash
