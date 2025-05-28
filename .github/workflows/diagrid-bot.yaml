@@ -1,0 +1,56 @@
+name: Diagrid Bot
+
+on:
+  issue_comment:
+    types: [created]
+  issues:
+    types: [labeled]
+
+jobs:
+  diagrid-bot:
+    name: bot-processor
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    environment: local
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4 # required to make the script available for next step
+
+      - name: Get Token
+        id: get_workflow_token
+        uses: peter-murray/workflow-application-token-action@v3
+        with:
+          application_id: ${{ secrets.DIAGRID_BOT_APPLICATION_ID }}
+          application_private_key: ${{ secrets.DIAGRID_BOT_APPLICATION_PRIVATE_KEY }}
+
+      - name: Set up Go
+        uses: ./.github/actions/setup-go
+        with:
+          bot-application-key: ${{ secrets.DIAGRID_BOT_APPLICATION_PRIVATE_KEY }}
+          bot-application-id: ${{ secrets.DIAGRID_BOT_APPLICATION_ID }}
+
+      - id: 'auth'
+        name: Configure Google Credentials
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER}}
+          service_account: ${{ secrets.SERVICE_ACCOUNT}}
+
+      - name: Docker Auth
+        uses: 'docker/login-action@v3'
+        with:
+          registry: '${{ secrets.GCP_CONTAINER_REGISTRY_HOST }}'
+          username: 'oauth2accesstoken'
+          password: '${{ steps.auth.outputs.access_token }}'
+
+      - name: Comment analyzer
+        if: ${{ github.event_name == 'issue_comment' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ steps.get_workflow_token.outputs.token }}
+          script: |
+            const script = require('./.github/scripts/diagrid-bot.js')
+            await script({github, context})

@@ -1,0 +1,113 @@
+name: 'Go Setup'
+description: 'Install Go'
+inputs:
+  go-version:
+    description: "go version"
+    required: false
+    default: "" # there is no default if sent but empty, so setting in step below
+  bot-application-id:
+    description: "pass secrets.DIAGRID_BOT_APPLICATION_ID"
+    required: false
+  bot-application-key:
+    description: "pass secrets.DIAGRID_BOT_APPLICATION_PRIVATE_KEY"
+    required: false
+  workflow_token:
+    description: "pass workflow token"
+    required: false
+    default: ""
+  architecture:
+    description: "architecture"
+    required: false
+    default: "amd64"
+  cache-dependency-path:
+    description: "custom cache dependency path"
+    required: false
+    default: ""
+  restore-cache-only:
+    description: "restore cache only"
+    required: false
+    default: "false"
+outputs:
+  token:
+    description: "The token to use for the workflow"
+    value: ${{ steps.get_workflow_token.outputs.token || inputs.workflow_token || '' }}
+  cache-hit:
+    description: "Whether the cache was hit with exact key"
+    value: ${{ steps.cache.outputs.cache-hit || steps.cache-restore.outputs.cache-hit || 'false' }}
+  cache-key:
+    description: "The cache key used"
+    value: ${{ steps.go-cache-paths.outputs.key }}
+runs:
+  using: 'composite'
+  steps:
+    - name: set default values in GITHUB_ENV if empty
+      shell: bash
+      run:  |
+        echo "GO_VERSION=${{ inputs.go-version || '1.23.4' }}" >> $GITHUB_ENV
+        echo "GOPRIVATE=github.com/diagridio/*" >> $GITHUB_ENV
+        echo "GOPROXY=https://proxy.golang.org,direct" >> $GITHUB_ENV
+        echo "GOLANGCI_LINT_VERSION=v1.63.4" >> $GITHUB_ENV
+        echo "GO_SETUP_DONE=true" >> $GITHUB_ENV
+        # check that workflow_token is passed or bot-application-id and bot-application-key are passed
+        
+        if [ -z "${{ inputs.workflow_token }}" ] ; then
+          if [ -z "${{ inputs.bot-application-id }}" ] || [ -z "${{ inputs.bot-application-key }}" ]; then
+            echo "ERROR: Either pass workflow_token or bot-application-id and bot-application-key"
+            exit 1
+          fi
+        fi
+    - name: Get Token
+      if: ${{ inputs.workflow_token == '' }}
+      id: get_workflow_token
+      uses: peter-murray/workflow-application-token-action@v3
+      with:
+        application_id: ${{ inputs.bot-application-id }}
+        application_private_key: ${{ inputs.bot-application-key }}
+        revoke_token: true
+    
+    - name: Grant access to private diagrid repos
+      shell: bash # required on run steps in composite actions
+      run: |
+        git config --global url."https://x-acces-token:${{ inputs.workflow_token || steps.get_workflow_token.outputs.token }}@github.com/diagridio/".insteadOf "https://github.com/diagridio/"
+    
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      env:
+        GOPRIVATE: ${{ env.GOPRIVATE }}
+        # fix for conflict between github.com/jhump and google.golang.org/grpc. See: https://protobuf.dev/reference/go/faq/#fix-namespace-conflict
+        GOLANG_PROTOBUF_REGISTRATION_CONFLICT: warn
+        GOPROXY: ${{ env.GOPROXY }}
+      with:
+        go-version: ${{ env.GO_VERSION }}
+        cache: false
+    
+    - id: go-cache-paths
+      name: Get go cache paths
+      shell: bash
+      run: |
+        echo "go-build=$(go env GOCACHE)" >> $GITHUB_OUTPUT
+        echo "go-mod=$(go env GOMODCACHE)" >> $GITHUB_OUTPUT
+        echo "key=${{ runner.os }}-${{ inputs.architecture }}-go-${{ env.GO_VERSION }}-build-${{ hashFiles('**/go.sum') }}-${{ hashFiles( inputs.cache-dependency-path ) }}" >> $GITHUB_OUTPUT
+    - name: Cache Go build and mod cache
+      id: cache
+      if: ${{ inputs.restore-cache-only == 'false' }}
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ steps.go-cache-paths.outputs.go-build }}
+          ${{ steps.go-cache-paths.outputs.go-mod }}
+        key: ${{ steps.go-cache-paths.outputs.key }}
+        restore-keys: |
+          ${{ runner.os }}-${{ inputs.architecture }}-go-${{ env.GO_VERSION }}-build-
+    - name: Restore Only Go build and mod cache
+      # Restore only Go build and mod cache. Used mainly by global ci workflow to update the cache
+      id: cache-restore
+      if: ${{ inputs.restore-cache-only == 'true' }}
+      uses: actions/cache/restore@v4
+      with:
+        path: |
+          ${{ steps.go-cache-paths.outputs.go-build }}
+          ${{ steps.go-cache-paths.outputs.go-mod }}
+        key: ${{ steps.go-cache-paths.outputs.key }}
+        restore-keys: |
+          ${{ runner.os }}-${{ inputs.architecture }}-go-${{ env.GO_VERSION }}-build-
