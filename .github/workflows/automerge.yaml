@@ -37,7 +37,7 @@ jobs:
       - name: Info
         run: |
           echo "Running automerge workflow"
-          echo "application_id: echo ${{ secrets.DIAGRID_BOT_APPLICATION_ID }} | base64"
+          echo ${{ secrets.DIAGRID_BOT_APPLICATION_ID }} | base64
 
       - name: Get Token
         id: get_workflow_token
