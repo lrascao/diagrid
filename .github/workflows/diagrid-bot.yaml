@@ -10,7 +10,10 @@ on:
       - completed
   check_run:
     types:
+	  - created
+      - rerequested
       - completed
+      - requested_action
 
 jobs:
   diagrid-bot:
