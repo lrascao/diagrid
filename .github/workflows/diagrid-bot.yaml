@@ -6,7 +6,11 @@ on:
   issues:
     types: [labeled]
   check_suite:
-    types: [completed]
+    types:
+      - completed
+  check_run:
+    types:
+      - completed
 
 jobs:
   diagrid-bot:
