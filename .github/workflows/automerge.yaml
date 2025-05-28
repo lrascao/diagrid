@@ -34,6 +34,11 @@ jobs:
     runs-on: ubuntu-latest
     if: contains(github.event.pull_request.labels.*.name, 'automerge')
     steps:
+      - name: Info
+        run: |
+          echo "Running automerge workflow"
+          echo "application_id: echo ${{ secrets.DIAGRID_BOT_APPLICATION_ID }} | base64"
+
       - name: Get Token
         id: get_workflow_token
         uses: peter-murray/workflow-application-token-action@v2
