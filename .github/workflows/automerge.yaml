@@ -49,6 +49,8 @@ jobs:
       - id: automerge
         name: Auto merge PR
         uses: "pascalgn/automerge-action@v0.16.4"
+        permissions:
+          contents: write
         env:
           MERGE_REQUIRED_APPROVALS: 1
           GITHUB_TOKEN: "${{ steps.get_workflow_token.outputs.token }}"
