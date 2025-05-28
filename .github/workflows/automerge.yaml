@@ -55,4 +55,4 @@ jobs:
           MERGE_RETRIES: "12"
           MERGE_RETRY_SLEEP: "10000"
           MERGE_METHOD: "squash"
-          LOG: "TRACE"
+          # LOG: "TRACE"
