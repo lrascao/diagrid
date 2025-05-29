@@ -34,6 +34,14 @@ module.exports = async ({ github, context }) => {
   ) {
     await handleIssueLabeled({ github, context });
   } else if (
+    context.eventName == "pull_request"
+  ) {
+    await handlePullRequest({ github, context });
+  } else if (
+    context.eventName == "check_run"
+  ) {
+      console.log('check_run triggered');
+  } else if (
     context.eventName == "check_suite"
   ) {
       console.log('check_suite triggered');
@@ -41,6 +49,23 @@ module.exports = async ({ github, context }) => {
     console.log(`[main] event ${context.eventName} not supported, exiting.`);
   }
 };
+
+async function handlePullRequest({ github, context }) {
+    // await github.rest.checks.create({
+    //   owner: context.repo.owner,
+    //   repo: context.repo.repo,
+    //   head_sha: context.sha,
+    //   name: "Merge Checker",
+    //   status: "in_progress"
+    // });
+
+    const response = await github.rest.actions.createWorkflowDispatch({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        workflow_id: 'merge-checker.yaml',
+        ref: context.ref.replace('refs/heads/', ''),
+      });
+}
 
 /**
  * Handle issue comment create event.
