@@ -40,7 +40,7 @@ module.exports = async ({ github, context }) => {
   } else if (
     context.eventName == "check_run"
   ) {
-      console.log('check_run triggered');
+      await handleCheckRun({ github, context });
   } else if (
     context.eventName == "check_suite"
   ) {
@@ -49,6 +49,14 @@ module.exports = async ({ github, context }) => {
     console.log(`[main] event ${context.eventName} not supported, exiting.`);
   }
 };
+
+async function handleCheckRun({ github, context }) {
+    const payload = context.payload;
+    const checkRunId = payload.check_run.id;
+
+    console.log(`[handleCheckRun] check run event received: ${JSON.stringify(payload)}`);
+    console.log(`[handleCheckRun] check run id: ${checkRunId}`);
+}
 
 async function handlePullRequest({ github, context }) {
     const response = await github.rest.checks.create({
