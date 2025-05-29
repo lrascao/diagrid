@@ -66,7 +66,7 @@ async function handlePullRequest({ github, context }) {
         workflow_id: 'merge-checker.yaml',
         ref: 'main',
         inputs: {
-            "check-run-id": response.data.id,
+            "check-run-id": response.data.id.toString(),
             "check-run-status": "completed",
             "check-run-conclusion": "success",
         }
