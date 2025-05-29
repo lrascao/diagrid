@@ -51,21 +51,21 @@ module.exports = async ({ github, context }) => {
 };
 
 async function handlePullRequest({ github, context }) {
-    // await github.rest.checks.create({
-    //   owner: context.repo.owner,
-    //   repo: context.repo.repo,
-    //   head_sha: context.sha,
-    //   name: "Merge Checker",
-    //   status: "in_progress"
-    // });
+    await github.rest.checks.create({
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      head_sha: context.sha,
+      name: "Merge Checker",
+      status: "in_progress"
+    });
 
-    const response = await github.rest.actions.createWorkflowDispatch({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        workflow_id: 'merge-checker.yaml',
-        ref: 'main',
-      });
-    console.log(`[handlePullRequest] Workflow dispatched: ${response.status}`);
+    // const response = await github.rest.actions.createWorkflowDispatch({
+    //     owner: context.repo.owner,
+    //     repo: context.repo.repo,
+    //     workflow_id: 'merge-checker.yaml',
+    //     ref: 'main',
+    //   });
+    // console.log(`[handlePullRequest] Workflow dispatched: ${response.status}`);
 }
 
 /**
