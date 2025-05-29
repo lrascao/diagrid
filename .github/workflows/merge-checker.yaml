@@ -54,12 +54,23 @@ jobs:
         with:
           github-token: ${{ steps.get_workflow_token.outputs.token }}
           script: |
-            const checkRun = await github.rest.checks.update({
+            // 1. Find the check run by name and head SHA
+            const checkRuns = await github.rest.checks.listForRef({
               ...context.repo,
-              name: 'Merge Checker',
+              ref: context.sha,
+            });
+
+            const checkRun = checkRuns.data.check_runs.find(run => run.name === 'Merge Checker');
+
+            if (!checkRun) {
+              throw new Error('Check run not found');
+            }
+
+            await github.rest.checks.update({
+              ...context.repo,
+              check_run_id: checkRun.id,
               head_sha: context.sha,
-              status: 'completed',
-              conclusion: 'success',
+              status: 'rerequested',
               output: {
                 title: 'Merge Checker',
                 summary: 'Merge Checker completed successfully.',
