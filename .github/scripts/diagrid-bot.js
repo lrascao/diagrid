@@ -45,7 +45,6 @@ module.exports = async ({ github, context }) => {
     context.eventName == "check_suite"
   ) {
       console.log('check_suite triggered');
-  }
   } else {
     console.log(`[main] event ${context.eventName} not supported, exiting.`);
   }
