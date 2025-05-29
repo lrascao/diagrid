@@ -62,7 +62,6 @@ async function handleCheckSuite({ github, context }) {
     const payload = context.payload;
     const checkSuiteId = payload.check_suite.id;
 
-    console.log(`[handleCheckSuite] check suite event received: ${JSON.stringify(payload)}`);
     console.log(`[handleCheckSuite] check suite id: ${checkSuiteId}`);
 }
 
@@ -83,8 +82,8 @@ async function handlePullRequest({ github, context }) {
         ref: 'main',
         inputs: {
             "check-run-id": response.data.id.toString(),
-            "check-run-status": "completed",
-            "check-run-conclusion": "failure",
+            "check-run-status": "in_progress",
+            // "check-run-conclusion": "failure",
         }
       });
 }
