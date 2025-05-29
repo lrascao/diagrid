@@ -46,7 +46,8 @@ jobs:
           echo "Check run id: ${{ github.event.inputs.check-run-id }}"
           echo "Check run status: ${{ github.event.inputs.check-run-status }}"
           echo "Check run conclusion: ${{ github.event.inputs.check-run-conclusion }}"
-          exit 1
+          sleep 30
+          exit 0
 
       # - name: Update check
       #   uses: actions/github-script@v7
