@@ -27,7 +27,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           github-token: ${{ steps.get_workflow_token.outputs.token }}
-          debug: true
+          debug: false
           script: |
             // This script checks all open pull requests for in-progress check runs
             const { data: pulls } = await github.rest.pulls.list({
@@ -48,8 +48,8 @@ jobs:
               });
 
               for (const check of checkRuns.check_runs) {
-                if (check.name !== 'Merge Checker') continue; // optional: filter by name
                 console.log(`🟡 Found in-progress check run: ${check.id} (${check.name})`);
+                if (check.name !== 'Merge Checker') continue; // optional: filter by name
 
                 const response = await github.rest.actions.createWorkflowDispatch({
                     owner: context.repo.owner,
