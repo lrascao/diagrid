@@ -68,7 +68,7 @@ async function handlePullRequest({ github, context }) {
         inputs: {
             "check-run-id": response.data.id.toString(),
             "check-run-status": "completed",
-            "check-run-conclusion": "success",
+            "check-run-conclusion": "failure",
         }
       });
 }
