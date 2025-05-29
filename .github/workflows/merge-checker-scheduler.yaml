@@ -12,6 +12,7 @@ jobs:
       pull-requests: read
       contents: read
       checks: read
+      actions: write
 
     steps:
       - name: Checkout code
