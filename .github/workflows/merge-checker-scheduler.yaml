@@ -46,7 +46,7 @@ jobs:
               });
 
               for (const check of checkRuns.check_runs) {
-                console.log(`🟡 Found in-progress check run: ${check.id} (${check.name} (${cr.status} / ${cr.conclusion}))`);
+                console.log(`🟡 Found in-progress check run: ${check.id} (${check.name} (${check.status} / ${check.conclusion}))`);
                 if (check.name !== 'Merge Checker') continue; // optional: filter by name
 
                 const response = await github.rest.actions.createWorkflowDispatch({
