@@ -11,6 +11,7 @@ jobs:
     permissions:
       pull-requests: read
       contents: read
+      checks: read
 
     steps:
       - name: Checkout code
