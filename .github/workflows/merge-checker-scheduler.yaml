@@ -37,18 +37,16 @@ jobs:
             });
 
             for (const pr of pulls) {
-              const sha = pr.head.sha;
-              console.log(`🔍 Checking PR #${pr.number} with SHA ${sha}`);
+              console.log(`🔍 Checking PR #${pr.number} with SHA ${pr.head.sha}`);
 
               const { data: checkRuns } = await github.rest.checks.listForRef({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: sha,
-                status: 'in_progress',
+                ref: pr.head.sha,
               });
 
               for (const check of checkRuns.check_runs) {
-                console.log(`🟡 Found in-progress check run: ${check.id} (${check.name})`);
+                console.log(`🟡 Found in-progress check run: ${check.id} (${check.name} (${cr.status} / ${cr.conclusion}))`);
                 if (check.name !== 'Merge Checker') continue; // optional: filter by name
 
                 const response = await github.rest.actions.createWorkflowDispatch({
