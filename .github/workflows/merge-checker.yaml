@@ -2,6 +2,27 @@ name: Merge Checker
 
 on:
   workflow_dispatch:
+    inputs:
+      check-run-id:
+        description: Check run id
+        type: string
+      check-run-status:
+        description: Check run status
+        type: string
+      check-run-conclusion:
+        description: Check run conclusion
+        type: string
+  workflow_call:
+    inputs:
+      check-run-id:
+        description: Check run id
+        type: string
+      check-run-status:
+        description: Check run status
+        type: string
+      check-run-conclusion:
+        description: Check run conclusion
+        type: string
 
 jobs:
   checker:
@@ -24,8 +45,6 @@ jobs:
           echo "Testing Merge Checker"
           echo "Token: ${{ steps.get_workflow_token.outputs.token }}"
           echo "Event: ${{ github.event_name }}"
-          echo "Pull Request: ${{ github.event.pull_request.number }}"
-          echo "Labels: ${{ toJson(github.event.pull_request.labels) }}"
 
 
       - name: Update check
@@ -33,12 +52,12 @@ jobs:
         with:
           github-token: ${{ steps.get_workflow_token.outputs.token }}
           script: |
-            const checkRun = await github.rest.checks.update({
+            await github.rest.checks.update({
               ...context.repo,
-              name: 'Merge Checker',
+              check_run_id: ${{ github.event.inputs.check-run-id }},
               head_sha: context.sha,
-              status: 'completed',
-              conclusion: 'success',
+              status: ${{ github.event.inputs.check-run-status }},
+              conclusion: ${{ github.event.inputs.check-run-conclusion }},
               output: {
                 title: 'Merge Checker',
                 summary: 'Merge Checker completed successfully.',
