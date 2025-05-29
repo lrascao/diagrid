@@ -70,7 +70,8 @@ jobs:
               ...context.repo,
               check_run_id: checkRun.id,
               head_sha: context.sha,
-              status: 'rerequested',
+              status: 'in_progress',
+              conclusion: 'success',
               output: {
                 title: 'Merge Checker',
                 summary: 'Merge Checker completed successfully.',
