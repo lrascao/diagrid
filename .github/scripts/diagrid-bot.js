@@ -34,9 +34,9 @@ module.exports = async ({ github, context }) => {
   ) {
     await handleIssueLabeled({ github, context });
   } else if (
-    context.eventName == "check_suite"
+    context.eventName == "pull_request"
   ) {
-      console.log('check_suite triggered');
+      console.log('pull_request triggered');
   } else {
     console.log(`[main] event ${context.eventName} not supported, exiting.`);
   }
