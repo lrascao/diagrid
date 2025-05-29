@@ -3,17 +3,10 @@ name: Merge Checker
 on:
   workflow_dispatch:
     inputs:
-      check-run-id:
-        description: Check run id
-        type: string
-      check-run-status:
-        description: Check run status
-        type: string
-      check-run-conclusion:
-        description: Check run conclusion
-        type: string
-  workflow_call:
-    inputs:
+      pr-number:
+        description: Pull request number
+        type: number
+        required: true
       check-run-id:
         description: Check run id
         type: string
@@ -43,27 +36,28 @@ jobs:
         id: merge-checker
         run: |
           echo "Testing Merge Checker"
+          echo "PR Number: ${{ github.event.inputs.pr-number }}"
           echo "Token: ${{ steps.get_workflow_token.outputs.token }}"
           echo "Event: ${{ github.event_name }}"
           echo "Check run id: ${{ github.event.inputs.check-run-id }}"
           echo "Check run status: ${{ github.event.inputs.check-run-status }}"
           echo "Check run conclusion: ${{ github.event.inputs.check-run-conclusion }}"
 
-      - name: Update check
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ steps.get_workflow_token.outputs.token }}
-          script: |
-            await github.rest.checks.update({
-              ...context.repo,
-              check_run_id: ${{ github.event.inputs.check-run-id }},
-              head_sha: context.sha,
-              status: "${{ github.event.inputs.check-run-status }}",
-              conclusion: "${{ github.event.inputs.check-run-conclusion }}",
-              output: {
-                title: 'Merge Checker',
-                summary: 'Merge Checker completed successfully.',
-                text: `Event: ${context.eventName}\n}`
-              }
-            });
+      # - name: Update check
+      #   uses: actions/github-script@v7
+      #   with:
+      #     github-token: ${{ steps.get_workflow_token.outputs.token }}
+      #     script: |
+      #       await github.rest.checks.update({
+      #         ...context.repo,
+      #         check_run_id: ${{ github.event.inputs.check-run-id }},
+      #         head_sha: context.sha,
+      #         status: "${{ github.event.inputs.check-run-status }}",
+      #         conclusion: "${{ github.event.inputs.check-run-conclusion }}",
+      #         output: {
+      #           title: 'Merge Checker',
+      #           summary: 'Merge Checker completed successfully.',
+      #           text: `Event: ${context.eventName}\n}`
+      #         }
+      #       });
 
