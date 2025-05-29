@@ -66,5 +66,4 @@ jobs:
                 text: `Event: ${context.eventName}\n}`
               }
             });
-            console.log('Check run created:', checkRun.data);
 
