@@ -65,8 +65,8 @@ async function handlePullRequest({ github, context }) {
         workflow_id: 'merge-checker.yaml',
         ref: 'main',
       });
+    console.log(`[handlePullRequest] Workflow dispatched: ${response.status}`);
 }
-
 
 /**
  * Handle issue comment create event.
