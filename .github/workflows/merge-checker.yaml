@@ -63,7 +63,7 @@ jobs:
               output: {
                 title: 'Merge Checker',
                 summary: 'Merge Checker completed successfully.',
-                text: `Event: ${context.eventName}\nPull Request: ${context.payload.pull_request.number}\nLabels: ${JSON.stringify(context.payload.pull_request.labels)}`
+                text: `Event: ${context.eventName}\n}`
               }
             });
             console.log('Check run created:', checkRun.data);
