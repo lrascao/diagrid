@@ -29,7 +29,6 @@ jobs:
           github-token: ${{ steps.get_workflow_token.outputs.token }}
           debug: true
           script: |
-            # This script checks all open pull requests for in-progress check runs
             const { data: pulls } = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
