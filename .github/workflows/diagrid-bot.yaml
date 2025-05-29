@@ -45,12 +45,6 @@ jobs:
           application_id: ${{ secrets.DIAGRID_BOT_APPLICATION_ID }}
           application_private_key: ${{ secrets.DIAGRID_BOT_APPLICATION_PRIVATE_KEY }}
 
-      - name: Set up Go
-        uses: ./.github/actions/setup-go
-        with:
-          bot-application-key: ${{ secrets.DIAGRID_BOT_APPLICATION_PRIVATE_KEY }}
-          bot-application-id: ${{ secrets.DIAGRID_BOT_APPLICATION_ID }}
-
       - id: 'auth'
         name: Configure Google Credentials
         uses: google-github-actions/auth@v2
