@@ -5,7 +5,7 @@ on:
     inputs:
       check-run-id:
         description: Check run id
-        type: string
+        type: number
       check-run-status:
         description: Check run status
         type: string
