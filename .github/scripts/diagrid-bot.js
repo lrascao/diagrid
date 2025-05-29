@@ -51,7 +51,7 @@ module.exports = async ({ github, context }) => {
 };
 
 async function handlePullRequest({ github, context }) {
-    await github.rest.checks.create({
+    const response = await github.rest.checks.create({
       owner: context.repo.owner,
       repo: context.repo.repo,
       head_sha: context.sha,
@@ -59,13 +59,17 @@ async function handlePullRequest({ github, context }) {
       status: "in_progress"
     });
 
-    const response = await github.rest.actions.createWorkflowDispatch({
+    await github.rest.actions.createWorkflowDispatch({
         owner: context.repo.owner,
         repo: context.repo.repo,
         workflow_id: 'merge-checker.yaml',
         ref: 'main',
+        inputs: {
+            check-run-id: response.data.id,
+            check-run-status: "completed",
+            check-run-conclusion: "success",
+        }
       });
-    console.log(`[handlePullRequest] Workflow dispatched: ${response.status}`);
 }
 
 /**
