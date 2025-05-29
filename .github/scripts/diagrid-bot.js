@@ -44,7 +44,7 @@ module.exports = async ({ github, context }) => {
   } else if (
     context.eventName == "check_suite"
   ) {
-      console.log('check_suite triggered');
+      await handleCheckSuite({ github, context });
   } else {
     console.log(`[main] event ${context.eventName} not supported, exiting.`);
   }
@@ -56,6 +56,14 @@ async function handleCheckRun({ github, context }) {
 
     console.log(`[handleCheckRun] check run event received: ${JSON.stringify(payload)}`);
     console.log(`[handleCheckRun] check run id: ${checkRunId}`);
+}
+
+async function handleCheckSuite({ github, context }) {
+    const payload = context.payload;
+    const checkSuiteId = payload.check_suite.id;
+
+    console.log(`[handleCheckSuite] check suite event received: ${JSON.stringify(payload)}`);
+    console.log(`[handleCheckSuite] check suite id: ${checkSuiteId}`);
 }
 
 async function handlePullRequest({ github, context }) {
