@@ -45,7 +45,9 @@ jobs:
           echo "Testing Merge Checker"
           echo "Token: ${{ steps.get_workflow_token.outputs.token }}"
           echo "Event: ${{ github.event_name }}"
-
+          echo "Check run id: ${{ github.event.inputs.check-run-id }}"
+          echo "Check run status: ${{ github.event.inputs.check-run-status }}"
+          echo "Check run conclusion: ${{ github.event.inputs.check-run-conclusion }}"
 
       - name: Update check
         uses: actions/github-script@v7
@@ -56,8 +58,8 @@ jobs:
               ...context.repo,
               check_run_id: ${{ github.event.inputs.check-run-id }},
               head_sha: context.sha,
-              status: ${{ github.event.inputs.check-run-status }},
-              conclusion: ${{ github.event.inputs.check-run-conclusion }},
+              status: "${{ github.event.inputs.check-run-status }}",
+              conclusion: "${{ github.event.inputs.check-run-conclusion }}",
               output: {
                 title: 'Merge Checker',
                 summary: 'Merge Checker completed successfully.',
