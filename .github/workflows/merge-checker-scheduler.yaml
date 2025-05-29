@@ -44,7 +44,7 @@ jobs:
               const runs = await github.rest.actions.listWorkflowRuns({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                workflow_id: 'merge-checker.yml', // can also be numeric ID
+                workflow_id: 'merge-checker.yaml', // can also be numeric ID
                 branch: pr.head.ref,
               });
               const latestRun = runs.data.workflow_runs[0];
