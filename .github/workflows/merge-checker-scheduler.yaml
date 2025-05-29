@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read
-      checks: write
       contents: read
 
     steps:
@@ -37,34 +36,4 @@ jobs:
               state: 'open',
             });
 
-            for (const pr of pulls) {
-              const sha = pr.head.sha;
-              console.log(`🔍 Checking PR #${pr.number} with SHA ${sha}`);
-
-              # const { data: checkRuns } = await github.rest.checks.listForRef({
-              #   owner: context.repo.owner,
-              #   repo: context.repo.repo,
-              #   ref: sha,
-              #   status: 'in_progress',
-              # });
-
-              # for (const check of checkRuns.check_runs) {
-              #   if (check.name !== 'Merge Checker') continue; // optional: filter by name
-              #   console.log(`🟡 Found in-progress check run: ${check.id} (${check.name})`);
-
-              #   const response = await github.rest.actions.createWorkflowDispatch({
-              #       owner: context.repo.owner,
-              #       repo: context.repo.repo,
-              #       workflow_id: 'merge-checker.yaml',
-              #       ref: 'main',
-              #       inputs: {
-              #           "check-run-id": check.id,
-              #           "pr-number": pr.number,
-              #       }
-              #     });
-
-              #   console.log(`🔄 Triggered merge-checker workflow for check run ID: ${check.id}`);
-              #   break;  // Exit after finding the first in-progress check run
-              # }
-            }
 
