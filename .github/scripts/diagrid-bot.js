@@ -63,7 +63,7 @@ async function handlePullRequest({ github, context }) {
         owner: context.repo.owner,
         repo: context.repo.repo,
         workflow_id: 'merge-checker.yaml',
-        ref: context.ref.replace('refs/heads/', ''),
+        ref: 'main',
       });
 }
 
