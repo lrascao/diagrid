@@ -36,11 +36,30 @@ module.exports = async ({ github, context }) => {
   } else if (
     context.eventName == "pull_request"
   ) {
-      console.log('pull_request triggered');
+    await handlePullRequest({ github, context });
+  } else if (
+    context.eventName == "check_run"
+  ) {
+      console.log('check_run triggered');
+  } else if (
+    context.eventName == "check_suite"
+  ) {
+      console.log('check_suite triggered');
+  }
   } else {
     console.log(`[main] event ${context.eventName} not supported, exiting.`);
   }
 };
+
+async function handlePullRequest({ github, context }) {
+    await github.rest.checks.create({
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      head_sha: context.sha,
+      name: "merge-checker",
+      status: "in_progress"
+    });
+}
 
 /**
  * Handle issue comment create event.
