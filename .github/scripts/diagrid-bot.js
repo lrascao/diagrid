@@ -66,26 +66,14 @@ async function handleCheckSuite({ github, context }) {
 }
 
 async function handlePullRequest({ github, context }) {
-    const response = await github.rest.checks.create({
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-      head_sha: context.sha,
-      name: "Merge Checker",
-      status: "in_progress"
-    });
-    console.log(`[handlePullRequest] created check run with id ${response.data.id}`);
-
-    await github.rest.actions.createWorkflowDispatch({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        workflow_id: 'merge-checker.yaml',
-        ref: 'main',
-        inputs: {
-            "check-run-id": response.data.id.toString(),
-            "check-run-status": "in_progress",
-            // "check-run-conclusion": "failure",
-        }
-      });
+    // const response = await github.rest.checks.create({
+    //   owner: context.repo.owner,
+    //   repo: context.repo.repo,
+    //   head_sha: context.sha,
+    //   name: "Merge Checker",
+    //   status: "in_progress"
+    // });
+    // console.log(`[handlePullRequest] created check run with id ${response.data.id}`);
 }
 
 /**
