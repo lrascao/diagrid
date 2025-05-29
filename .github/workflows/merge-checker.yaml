@@ -48,7 +48,7 @@ jobs:
               ...context.repo,
               check_run_id: checkRun.id,
               head_sha: context.sha,
-              status: 'in_progress',
+              status: 'completed',
               conclusion: 'failure',
               output: {
                 title: 'Merge Checker',
