@@ -40,29 +40,37 @@ jobs:
             for (const pr of pulls) {
               console.log(`🔍 Checking PR #${pr.number} with SHA ${pr.head.sha}`);
 
-              const { data: checkRuns } = await github.rest.checks.listForRef({
+              const runs = await github.rest.actions.listWorkflowRuns({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: pr.head.sha,
+                workflow_id: 'merge-checker.yml', // can also be numeric ID
+                branch: pr.head.ref,
               });
-
-              for (const check of checkRuns.check_runs) {
-                console.log(`🟡 Found in-progress check run: ${check.id} (${check.name} (${check.status} / ${check.conclusion}))`);
-                if (check.name !== 'Merge Checker') continue; // optional: filter by name
-
-                const response = await github.rest.actions.createWorkflowDispatch({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    workflow_id: 'merge-checker.yaml',
-                    ref: 'main',
-                    inputs: {
-                        "check-run-id": check.id,
-                        "pr-number": pr.number,
-                    }
-                  });
-
-                console.log(`🔄 Triggered merge-checker workflow for check run ID: ${check.id}`);
-                break;  // Exit after finding the first in-progress check run
+              const latestRun = runs.data.workflow_runs[0];
+              if (!latestRun) {
+                console.log(`❌ No in-progress workflow run found for PR #${pr.number}`);
+                continue; // Skip to the next PR if no in-progress run
               }
+
+              console.log(`🟡 Found merge-checker workflow run: ${latestRun.id} (${latestRun.name} (${latestRun.status} / ${latestRun.conclusion}))`);
+              // Check if the latest run is in progress, if so move on
+              if (latestRun.status == 'in_progress') {
+                console.log(`✅ Workflow already in progress for PR #${pr.number}`);
+                continue; // Skip to the next PR if already in progress
+              }
+
+              // If the latest run is successful, move on
+              if (latestRun.status === 'completed' && latestRun.conclusion === 'success') {
+                console.log(`✅ Workflow already completed successfully for PR #${pr.number}`);
+                continue; // Skip to the next PR if already completed successfully
+              }
+
+              // Otherwise, re-run the workflow
+              await github.rest.actions.reRunWorkflow({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: latestRun.id,
+              });
+              console.log(`🔄 Re-running merge-checker workflow for PR #${pr.number}`);
             }
 
