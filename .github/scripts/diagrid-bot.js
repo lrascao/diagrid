@@ -58,7 +58,7 @@ async function handlePullRequest({ github, context }) {
       name: "Merge Checker",
       status: "in_progress"
     });
-    console.log(`[handlePullRequest] created check run: ${response}`);
+    console.log(`[handlePullRequest] created check run with id ${response.data.id}`);
 
     await github.rest.actions.createWorkflowDispatch({
         owner: context.repo.owner,
