@@ -40,32 +40,53 @@ module.exports = async ({ github, context }) => {
   } else if (
     context.eventName == "check_run"
   ) {
-      console.log('check_run triggered');
+      await handleCheckRun({ github, context });
   } else if (
     context.eventName == "check_suite"
   ) {
-      console.log('check_suite triggered');
+      await handleCheckSuite({ github, context });
   } else {
     console.log(`[main] event ${context.eventName} not supported, exiting.`);
   }
 };
 
+async function handleCheckRun({ github, context }) {
+    const payload = context.payload;
+    const checkRunId = payload.check_run.id;
+
+    console.log(`[handleCheckRun] check run event received: ${JSON.stringify(payload)}`);
+    console.log(`[handleCheckRun] check run id: ${checkRunId}`);
+}
+
+async function handleCheckSuite({ github, context }) {
+    const payload = context.payload;
+    const checkSuiteId = payload.check_suite.id;
+
+    console.log(`[handleCheckSuite] check suite event received: ${JSON.stringify(payload)}`);
+    console.log(`[handleCheckSuite] check suite id: ${checkSuiteId}`);
+}
+
 async function handlePullRequest({ github, context }) {
-    await github.rest.checks.create({
+    const response = await github.rest.checks.create({
       owner: context.repo.owner,
       repo: context.repo.repo,
       head_sha: context.sha,
       name: "Merge Checker",
       status: "in_progress"
     });
+    console.log(`[handlePullRequest] created check run with id ${response.data.id}`);
 
-    const response = await github.rest.actions.createWorkflowDispatch({
+    await github.rest.actions.createWorkflowDispatch({
         owner: context.repo.owner,
         repo: context.repo.repo,
         workflow_id: 'merge-checker.yaml',
         ref: 'main',
+        inputs: {
+            "check-run-id": response.data.id.toString(),
+            "check-run-status": "completed",
+            "check-run-conclusion": "failure",
+        }
       });
-    console.log(`[handlePullRequest] Workflow dispatched: ${response.status}`);
 }
 
 /**
